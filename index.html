@@ -1,131 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personalised Reminder App</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    .container {
-      max-width: 400px;
-      margin: 40px auto;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
-    .header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-    .button {
-      background-color: #4CAF50;
-      color: #fff;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .button:hover {
-      background-color: #3e8e41;
-    }
-    .input {
-      width: 95%;
-      padding: 10px;
-      margin-right: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-    }
-    .reminders {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-    }
-    .reminder {
-      padding: 10px;
-      border-bottom: 1px solid #ccc;
-    }
-    .reminder:last-child {
-      border-bottom: none;
-    }
-    .delete {
-      background-color: #f44336;
-      color: #fff;
-      padding: 5px 10px;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .delete:hover {
-      background-color: #e91e63;
-    }
-    .hide {
-      display: none;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROCK PAPER GAME</title>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        h1{
+            background-color: #081b31;
+            color: #fff;
+            height: 5rem;
+            text-align: center;
+            line-height: 5rem;
+        }
+        .choice{
+            height: 200px;
+            width: 200px; 
+            border-radius: 50%;
+        }
+        
+        .choice:hover{
+            opacity: 0.5;
+            cursor: pointer;
+        }
+        img{
+            height: 200px;
+            width: 200px;
+            border-radius: 50%;
+        }
+        
+        .choices{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            margin-top: 5rem;
+        }
+        .score-board{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            margin-top:5rem;
+            gap: 5rem;
+        }
+        #user-score,#comp-score{
+            font-size: 4rem;
+        }
+        
+        .msg-container{
+            margin-top: 5rem;
+        }
+        
+        #msg{
+            margin-top: 5rem;
+            background-color: #081b31;
+            color: white;
+            font-size: 2rem;
+            display: inline;
+            justify-content: center;
+            border-radius: 1rem;
+            padding: 1rem;
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="header">Personalised Reminder App</h1>
-    <input type="text" id="reminder-text" class="input" placeholder="Enter reminder "><br>
-    <button class="button" id="start-listening">Voice Assistant</button><br>
-    <button class="button hide" id="stop-listening">Stop Listening</button><br>
-    <button class="button" id="add-reminder">Add Reminder</button>
-    <ul id="reminders" class="reminders"></ul>
-  </div>
+<h1>ROCK PAPER SCISSORS GAME</h1>
+<div class="choices">
+    <div class="choice" id="rock">
+        <img src="rock.png">
+    </div>
+    <div class="choice" id="paper">
+        <img src="paper.png">
+    </div>
+    <div class="choice" id="scissors">
+        <img src="scissors.png">
+    </div>
+</div>
+    <div class="score-board">
+        <div class="score">
+            <p id="user-score">0</p>
+            <p>You</p>
+        </div>
+        <div class="score">
+            <p id="comp-score">0</p>
+            <p>Comp</p>
+        </div>
+    </div>
 
-  <script>
-    const recognition = new webkitSpeechRecognition();
-    let reminders = [];
+    <div class="msg-container">
+        <p id="msg">Play Your Move</p>
+    </div>
+    <script>
+        let userScore = 0;
+        let compScore = 0;
 
-    recognition.lang = 'en-US';
-    recognition.maxResults = 10;
+        const choices = document.querySelectorAll(".choice");
 
-    recognition.onresult = event => document.getElementById('reminder-text').value = event.results[0][0].transcript;
+        choices.forEach(choice => {
+            choice.addEventListener("click", playGame);
+        });
 
-    recognition.onstart = () => {
-      document.getElementById('start-listening').classList.add('hide');
-      document.getElementById('stop-listening').classList.remove('hide');
-    };
+        function getComputerChoice() {
+            const computerChoice = ["rock", "paper", "scissors"];
+            const randomNum = Math.floor(Math.random() * 3);
+            return computerChoice[randomNum];
+        }
 
-    recognition.onend = () => {
-      document.getElementById('start-listening').classList.remove('hide');
-      document.getElementById('stop-listening').classList.add('hide');
-    };
+        function playGame() {
+            const userChoice = this.id;
+            const computerChoice = getComputerChoice();
+            console.log(`User chose ${userChoice}, computer chose ${computerChoice}`);
+            determineWinner(userChoice, computerChoice);
+        }
 
-    document.getElementById('start-listening').addEventListener('click', () => {
-      recognition.start();
-    });
-
-    document.getElementById('stop-listening').addEventListener('click', () => {
-      recognition.stop();
-    });
-
-    document.getElementById('add-reminder').addEventListener('click', () => {
-      const reminderText = document.getElementById('reminder-text').value.trim();
-      if (reminderText) {
-        reminders.push({ text: reminderText });
-        const reminderElement = document.createElement('li');
-        reminderElement.classList.add('reminder');
-        reminderElement.innerHTML = `
-          <span>${reminderText}</span>
-          <button class="delete">Delete</button>
-        `;
-        document.getElementById('reminders').appendChild(reminderElement);
-        document.getElementById('reminder-text').value = '';
-      }
-    });
-
-    document.getElementById('reminders').addEventListener('click', event => {
-      if (event.target.classList.contains('delete')) {
-        const reminderElement = event.target.parentNode;
-        reminders = reminders.filter(reminder => reminder.text !== reminderElement.querySelector('span').textContent);
-        reminderElement.remove();
-      }
-    });
-  </script>
+        function determineWinner(userChoice, computerChoice) {
+            if (userChoice === computerChoice) {
+                document.getElementById("msg").innerText = "It's a tie!";
+            } else if ((userChoice === "rock" && computerChoice === "scissors") ||
+                       (userChoice === "paper" && computerChoice === "rock") ||
+                       (userChoice === "scissors" && computerChoice === "paper")) {
+                userScore++;
+                document.getElementById("msg").innerText = "User wins!";
+            } else {
+                compScore++;
+                document.getElementById("msg").innerText = "Computer wins!";
+            }
+            document.getElementById("user-score").innerText = userScore;
+            document.getElementById("comp-score").innerText = compScore;
+            console.log(`User score: ${userScore}, Computer score: ${compScore}`);
+        }
+    </script>
 </body>
 </html>
