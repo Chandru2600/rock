@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Personalised Reminder App</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      max-width: 400px;
+      margin: 40px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .button {
+      background-color: #4CAF50;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #3e8e41;
+    }
+    .input {
+      width: 95%;
+      padding: 10px;
+      margin-right: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+    }
+    .reminders {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .reminder {
+      padding: 10px;
+      border-bottom: 1px solid #ccc;
+    }
+    .reminder:last-child {
+      border-bottom: none;
+    }
+    .delete {
+      background-color: #f44336;
+      color: #fff;
+      padding: 5px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .delete:hover {
+      background-color: #e91e63;
+    }
+    .hide {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="header">Personalised Reminder App</h1>
+    <input type="text" id="reminder-text" class="input" placeholder="Enter reminder "><br>
+    <button class="button" id="start-listening">Voice Assistant</button><br>
+    <button class="button hide" id="stop-listening">Stop Listening</button><br>
+    <button class="button" id="add-reminder">Add Reminder</button>
+    <ul id="reminders" class="reminders"></ul>
+  </div>
+
+  <script>
+    const recognition = new webkitSpeechRecognition();
+    let reminders = [];
+
+    recognition.lang = 'en-US';
+    recognition.maxResults = 10;
+
+    recognition.onresult = event => document.getElementById('reminder-text').value = event.results[0][0].transcript;
+
+    recognition.onstart = () => {
+      document.getElementById('start-listening').classList.add('hide');
+      document.getElementById('stop-listening').classList.remove('hide');
+    };
+
+    recognition.onend = () => {
+      document.getElementById('start-listening').classList.remove('hide');
+      document.getElementById('stop-listening').classList.add('hide');
+    };
+
+    document.getElementById('start-listening').addEventListener('click', () => {
+      recognition.start();
+    });
+
+    document.getElementById('stop-listening').addEventListener('click', () => {
+      recognition.stop();
+    });
+
+    document.getElementById('add-reminder').addEventListener('click', () => {
+      const reminderText = document.getElementById('reminder-text').value.trim();
+      if (reminderText) {
+        reminders.push({ text: reminderText });
+        const reminderElement = document.createElement('li');
+        reminderElement.classList.add('reminder');
+        reminderElement.innerHTML = `
+          <span>${reminderText}</span>
+          <button class="delete">Delete</button>
+        `;
+        document.getElementById('reminders').appendChild(reminderElement);
+        document.getElementById('reminder-text').value = '';
+      }
+    });
+
+    document.getElementById('reminders').addEventListener('click', event => {
+      if (event.target.classList.contains('delete')) {
+        const reminderElement = event.target.parentNode;
+        reminders = reminders.filter(reminder => reminder.text !== reminderElement.querySelector('span').textContent);
+        reminderElement.remove();
+      }
+    });
+  </script>
+</body>
+</html>
